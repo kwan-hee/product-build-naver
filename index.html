@@ -1,14 +1,134 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <title>네이버 블로그 자동 생성 도구</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Naver Blog Writing Tool</p>
+        <h1>네이버 블로그 자동 생성 웹앱</h1>
+        <p class="subtitle">기사 원문이나 메모를 넣으면 제목, 도입문, 본문, 결론, 해시태그까지 한 번에 정리하고, 네이버 블로그에 바로 붙여넣기 좋은 최종 원고까지 만들어주는 데모 버전입니다.</p>
+      </div>
+      <div class="topbar-actions">
+        <a href="/page2.html" class="ghost-button">새 웹페이지</a>
+        <button id="fillExampleButton" class="ghost-button" type="button">예시 불러오기</button>
+        <button id="generateAllButton" class="primary-button" type="button" disabled>전체 생성</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel input-panel">
+        <div class="panel-header">
+          <h2>입력</h2>
+          <span class="panel-badge">데모 로컬 생성</span>
+        </div>
+
+        <label class="field-label" for="sourceText">기사 원문 또는 메모</label>
+        <textarea id="sourceText" class="source-text" placeholder="기사 원문, 인터뷰 메모, 제품 소개 초안 등을 붙여넣어 주세요."></textarea>
+        <div class="field-meta">
+          <span id="charCount">0자</span>
+          <span>권장: 300자 이상</span>
+        </div>
+
+        <div class="style-picker">
+          <span class="field-label">블로그 말투 스타일</span>
+          <div class="style-options">
+            <label class="style-card">
+              <input type="radio" name="tone" value="informative" checked />
+              <span>정보형</span>
+              <small>정리 중심, 담백한 설명</small>
+            </label>
+            <label class="style-card">
+              <input type="radio" name="tone" value="review" />
+              <span>후기형</span>
+              <small>경험 공유 느낌, 생활형 톤</small>
+            </label>
+            <label class="style-card">
+              <input type="radio" name="tone" value="soft" />
+              <span>부드러운 설명형</span>
+              <small>차분하고 친절한 설명</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="action-grid">
+          <button id="generateTitlesButton" class="secondary-button" type="button" >제목 5개 추천</button>
+          <button id="generateIntroButton" class="secondary-button" type="button">도입문 생성</button>
+          <button id="generateBodyButton" class="secondary-button" type="button">본문 생성</button>
+          <button id="generateConclusionButton" class="secondary-button" type="button">결론 생성</button>
+          <button id="generateTagsButton" class="secondary-button" type="button">해시태그 생성</button>
+          <button id="resetButton" class="danger-button" type="button">초기화</button>
+        </div>
+      </section>
+
+      <section class="panel output-panel">
+        <div class="panel-header">
+          <h2>결과</h2>
+          <div class="panel-tools">
+            <span id="statusText" class="status-text">예시 데이터를 불러오거나 직접 입력한 뒤 생성 버튼을 눌러 주세요.</span>
+            <button id="copyAllButton" class="ghost-button" type="button" disabled>전체 결과 복사</button>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <article class="result-card result-card-wide final-post-card">
+            <div class="result-head">
+              <h3>네이버 블로그 편집용 최종 원고</h3>
+              <button id="copyPostButton" class="secondary-button compact-button" type="button" disabled>최종 원고 복사</button>
+            </div>
+            <p class="helper-text">추천 제목을 누르면 선택된 제목 기준으로 최종 원고가 다시 조합됩니다.</p>
+            <textarea id="finalPostOutput" class="final-post-output" readonly></textarea>
+          </article>
+
+          <article class="result-card">
+            <div class="result-head">
+              <h3>추천 제목</h3>
+              <span>5개</span>
+            </div>
+            <ol id="titlesList" class="title-list"></ol>
+          </article>
+
+          <article class="result-card">
+            <div class="result-head">
+              <h3>도입문</h3>
+            </div>
+            <div id="introOutput" class="text-output"></div>
+          </article>
+
+          <article class="result-card result-card-wide">
+            <div class="result-head">
+              <h3>본문</h3>
+            </div>
+            <div id="bodyOutput" class="text-output rich-output"></div>
+          </article>
+
+          <article class="result-card">
+            <div class="result-head">
+              <h3>결론</h3>
+            </div>
+            <div id="conclusionOutput" class="text-output"></div>
+          </article>
+
+          <article class="result-card">
+            <div class="result-head">
+              <h3>해시태그</h3>
+              <span>10개</span>
+            </div>
+            <div id="tagsOutput" class="tag-output"></div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script defer src="/main.js"></script>
+  
 </body>
 </html>
