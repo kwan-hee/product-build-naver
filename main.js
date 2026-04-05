@@ -324,13 +324,13 @@ function normalizeGenerationResult(result) {
   return { titles, intro, body, conclusion, tags };
 }
 
-async function requestGeneration(text, tone) {
+async function requestGeneration(text, tone, mode) {
   let response;
 
   try {
-
-    const endpoint = mode === "titles" ? "/generate-titles"
-    : "/generate";
+    const endpoint = mode === "titles" 
+  ? "/generate-titles" 
+  : "/generate";
 
     response = await fetch(endpoint, {
       method: "POST",
@@ -340,7 +340,7 @@ async function requestGeneration(text, tone) {
       body: JSON.stringify({ sourceText: text, tone }),
     });
   } catch (error) {
-    throw new Error("서버에 연결하지 못했습니다. server.js가 실행 중인지 확인해 주세요.");
+    throw new Error("서버에 연결하지 못했습니다. server.js가 3001번 포트에서 실행 중인지 확인해 주세요.");
   }
 
   let payload = null;
@@ -348,14 +348,21 @@ async function requestGeneration(text, tone) {
   try {
     payload = await response.json();
   } catch (error) {
-    throw new Error("서버 응답을 해석하지 못했습니다.");
+    throw new Error(`서버 응답을 해석하지 못했습니다. (Status: ${response.status})`);
   }
 
   if (!response.ok) {
-    throw new Error(payload?.error || "생성 요청에 실패했습니다.");
+    throw new Error(payload?.error || `생성 요청이 실패했습니다. (Status: ${response.status})`);
   }
 
-  return normalizeGenerationResult(payload);
+  if (mode === "titles") {
+    if (!payload.titles || !Array.isArray(payload.titles) || payload.titles.length !== 5) {
+        throw new Error("서버에서 받은 제목 데이터 형식이 올바르지 않습니다.");
+    }
+    return payload;
+  } else {
+    return normalizeGenerationResult(payload);
+  }
 }
 
 function applyGeneratedResult(result, mode) {
@@ -529,4 +536,3 @@ fillExample({ silent: true });
 setStatus("예시 데이터가 기본으로 채워져 있습니다. 서버를 실행한 뒤 생성 버튼을 눌러 주세요.");
 updateCharCount();
 renderAll();
-
